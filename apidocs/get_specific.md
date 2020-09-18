@@ -10,14 +10,17 @@ Get the content of the review by review ID.
 
 **Code** : `200 OK`
 
-**Request Body Examples**
-
+**Response Body**
+|  | Data Type  | Description  | 
+|---|---|---|
+| id | Integer | Review ID |
+| reviewContent | String | Content of the review |
 
 ```json
 {
     "data": {
-        "id": 1234 // Review ID (Integer),
-        "review_content": "review_content" // Review Content (String)
+        "id": 1234,
+        "reviewContent": "review_content"
     },
     "errors" : []
 }
