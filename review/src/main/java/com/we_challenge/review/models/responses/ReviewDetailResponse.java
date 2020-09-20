@@ -14,4 +14,9 @@ public class ReviewDetailResponse {
         this.id = review.getId();
         this.reviewContent = review.getContent();
     }
+
+    public ReviewDetailResponse(Integer id, String reviewContent) {
+        this.id = id;
+        this.reviewContent = reviewContent;
+    }
 }
