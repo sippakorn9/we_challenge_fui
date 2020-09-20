@@ -1,6 +1,7 @@
 package com.we_challenge.review.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.we_challenge.review.models.requests.EditReviewRequest;
 import com.we_challenge.review.models.responses.ReviewDetailResponse;
 import com.we_challenge.review.services.ReviewService;
 import com.we_challenge.review.utils.Protocol;
@@ -11,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -39,7 +41,7 @@ public class ReviewControllerTest {
     public void getReviewByIdShouldErrorWhenNotFound() throws Exception {
         String url = Protocol.REVIEW_BY_ID.replace("{id}", "1");
 
-        Mockito.when(reviewService.getReviewById(Mockito.any())).thenReturn(null);
+        Mockito.when(reviewService.getReviewDetailById(Mockito.any())).thenReturn(null);
 
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
                 .get(url);
@@ -55,7 +57,7 @@ public class ReviewControllerTest {
         String url = Protocol.REVIEW_BY_ID.replace("{id}", "1");
         ReviewDetailResponse response = new ReviewDetailResponse(1, "content");
 
-        Mockito.when(reviewService.getReviewById(Mockito.any())).thenReturn(response);
+        Mockito.when(reviewService.getReviewDetailById(Mockito.any())).thenReturn(response);
 
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
                 .get(url);
@@ -63,6 +65,22 @@ public class ReviewControllerTest {
         mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reviewContent").value("content"));
+    }
+
+    @Test
+    public void editReviewByIdShouldSuccess() throws Exception {
+        String url = Protocol.REVIEW_BY_ID.replace("{id}", "1");
+        EditReviewRequest editReviewRequest = new EditReviewRequest("new content");
+
+        Mockito.doNothing().when(reviewService).saveReviewContent(Mockito.eq(1), Mockito.any());
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                .post(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(editReviewRequest))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk());
     }
 
 
