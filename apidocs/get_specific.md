@@ -18,11 +18,8 @@ Get the content of the review by review ID.
 
 ```json
 {
-    "data": {
-        "id": 1234,
-        "reviewContent": "review_content"
-    },
-    "errors" : []
+    "id": 1234,
+    "reviewContent": "review_content"
 }
 ```
 
@@ -33,10 +30,7 @@ For a user with ID 4321 on the local database but no details have been set yet.
 
 ```json
 {
-    "data" : {},
-    "errors" : 
-        [
-            {"code" : 404, "message" : "review not found."}
-        ]
+    "code" : 404, 
+    "message" : "review not found."
 }
 ```

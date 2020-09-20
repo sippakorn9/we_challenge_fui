@@ -23,11 +23,8 @@ Search all reviews that contain query text in the content with marked keyword
 **Content** : 
 ```json
 {
-    "data" : {
-        "count" : 0,
-        "reviews" : []
-    }, 
-    "errors" : [] 
+    "count" : 0,
+    "reviews" : []
 }
 ```
 
@@ -41,19 +38,16 @@ Search all reviews that contain query text in the content with marked keyword
 
 ```json
 {
-    "data" : {
-        "count" : 2,
-        "reviews" : [
-            {
-                "id": 1,
-                "reviewContent": "review <keyword>fried rice</keyword>",
-            },
-            {
-                "id": 2,
-                "reviewContent": "<keyword>fried rice</keyword> review and another <keyword>fried rice</keyword>",
-            }
-        ]
-    },
-    "errors" : []
+    "count" : 2,
+    "reviews" : [
+        {
+            "id": 1,
+            "reviewContent": "review <keyword>fried rice</keyword>",
+        },
+        {
+            "id": 2,
+            "reviewContent": "<keyword>fried rice</keyword> review and another <keyword>fried rice</keyword>",
+        }
+    ]
 }
 ```
