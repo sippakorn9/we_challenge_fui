@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Card, CardColumns, Form, Col, Button, Container, Row, Jumbotron, InputGroup } from 'react-bootstrap'
+import Parser from 'html-react-parser';
 
 export class ReviewList extends Component {
     constructor(props) {
@@ -135,7 +136,7 @@ export class ReviewList extends Component {
                                 <Card.Header>{item.id}</Card.Header>
                                 <Card.Body>
                                     <Card.Text>
-                                        {item.reviewContent}
+                                         {Parser(item.reviewContent.replaceAll('keyword', 'b'))}
                                     </Card.Text>
                                     <Button variant="outline-primary">Edit</Button>
                                 </Card.Body>
