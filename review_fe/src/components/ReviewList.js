@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, CardColumns, Form, Col, Button, Container, Row, Jumbotron, InputGroup } from 'react-bootstrap'
+import { Card, CardColumns, Form, Col, Button, Container, Row, Jumbotron, InputGroup, Modal } from 'react-bootstrap'
 import Parser from 'html-react-parser';
 
 export class ReviewList extends Component {
@@ -8,13 +8,18 @@ export class ReviewList extends Component {
         this.state = {
             isLoaded: false,
             error: null,
+            show: false,
             items: [],
             search: "1",
             select: 1,
             content: "",
         };
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChangeSearch = this.handleChangeSearch.bind(this);
+        this.handleSubmitSearch = this.handleSubmitSearch.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+        this.handleChangeEdit = this.handleChangeEdit.bind(this);
+        this.handleSubmitEdit = this.handleSubmitEdit.bind(this);
+        this.handleRequestToEdit = this.handleRequestToEdit.bind(this);
     }
 
     componentDidMount() {
@@ -65,11 +70,11 @@ export class ReviewList extends Component {
             )
     }
 
-    handleChange(event) {
+    handleChangeSearch(event) {
         this.setState({ search: event.target.value });
     }
 
-    handleSubmit(event) {
+    handleSubmitSearch(event) {
         if (this.state.search) {
             if (isNaN(this.state.search)) {
                 this.searchByQuery()
@@ -85,8 +90,37 @@ export class ReviewList extends Component {
         event.preventDefault();
     }
 
+    handleClose() {
+        this.setState({
+            show: false,
+        });
+    }
+
+    handleChangeEdit(event) {
+        this.setState({ content: event.target.value });
+    }
+
+    handleSubmitEdit() {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reviewContent: this.state.content })
+        };
+        fetch("http://localhost:8080/reviews/" + this.state.select, requestOptions)
+            .then(data => this.setState({ show: false, items: []}));
+    }
+
+    handleRequestToEdit(event, item) {
+        this.setState({
+            show: true,
+            content: item.reviewContent.replaceAll('<keyword>', '').replaceAll('</keyword>', ''),
+            select: item.id,
+        });
+        event.preventDefault();
+    }
+
     render() {
-        const { error, isLoaded, items } = this.state;
+        const { error, isLoaded, items, search, show, select, content } = this.state;
         if (error) {
             return <div>Error: {error.message}</div>;
         } else if (!isLoaded) {
@@ -106,14 +140,14 @@ export class ReviewList extends Component {
                     <Row>
                         <Col />
                         <Col>
-                            <form onSubmit={this.handleSubmit}>
+                            <form onSubmit={this.handleSubmitSearch}>
                                 <InputGroup className="mb-3">
                                     <Form.Control
                                         className="mb-3"
                                         id="inlineFormInput"
                                         placeholder="Review ID or (Food) Keyword"
                                         defaultValue="1"
-                                        value={this.state.value} onChange={this.handleChange}
+                                        value={this.state.search} onChange={this.handleChangeSearch}
                                     />
                                     <InputGroup.Append>
                                         <Button variant="outline-primary" type="submit" className="mb-3">
@@ -136,13 +170,31 @@ export class ReviewList extends Component {
                                 <Card.Header>{item.id}</Card.Header>
                                 <Card.Body>
                                     <Card.Text>
-                                         {Parser(item.reviewContent.replaceAll('keyword', 'b'))}
+                                        {Parser(item.reviewContent.replaceAll('keyword', 'b'))}
                                     </Card.Text>
-                                    <Button variant="outline-primary">Edit</Button>
+                                    <Button variant="outline-primary" onClick={e => this.handleRequestToEdit(e, item)}>Edit</Button>
                                 </Card.Body>
                             </Card>
                         ))}
                     </CardColumns>
+                    <Modal show={show} onHide={this.handleClose} animation={false}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Edit review : {select}</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Form.Group controlId="reviewEditForm.TextArea">
+                                <Form.Control as="textarea" rows={20} defaultValue={content} value={this.state.content} onChange={this.handleChangeEdit} />
+                            </Form.Group>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={this.handleClose}>
+                                Close
+                            </Button>
+                            <Button variant="primary" onClick={this.handleSubmitEdit}>
+                                Save Changes
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
                 </Container >
             );
         }
