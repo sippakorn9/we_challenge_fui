@@ -146,7 +146,6 @@ export class ReviewList extends Component {
                                         className="mb-3"
                                         id="inlineFormInput"
                                         placeholder="Review ID or (Food) Keyword"
-                                        defaultValue="1"
                                         value={this.state.search} onChange={this.handleChangeSearch}
                                     />
                                     <InputGroup.Append>
@@ -183,7 +182,7 @@ export class ReviewList extends Component {
                         </Modal.Header>
                         <Modal.Body>
                             <Form.Group controlId="reviewEditForm.TextArea">
-                                <Form.Control as="textarea" rows={20} defaultValue={content} value={this.state.content} onChange={this.handleChangeEdit} />
+                                <Form.Control as="textarea" rows={20} value={this.state.content} onChange={this.handleChangeEdit} />
                             </Form.Group>
                         </Modal.Body>
                         <Modal.Footer>
