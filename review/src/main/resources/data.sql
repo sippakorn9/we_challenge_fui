@@ -11,5 +11,8 @@ ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 KEYWORD NVARCHAR(100)
 );
 
+CREATE INDEX keyword
+ON Keyword(keyword);
+
 INSERT INTO Keyword (KEYWORD)
 select * FROM CSVREAD('src/main/resources/n_food_dictionary.csv');

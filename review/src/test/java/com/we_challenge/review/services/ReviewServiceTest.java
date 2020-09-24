@@ -5,7 +5,7 @@ import com.we_challenge.review.entities.Review;
 import com.we_challenge.review.models.requests.EditReviewRequest;
 import com.we_challenge.review.models.responses.ReviewDetailResponse;
 import com.we_challenge.review.models.responses.ReviewListResponse;
-import com.we_challenge.review.repositories.KeywordRepositoryCustom;
+import com.we_challenge.review.repositories.KeywordRepository;
 import com.we_challenge.review.repositories.ReviewRepository;
 import com.we_challenge.review.repositories.ReviewRepositoryCustom;
 import org.junit.Assert;
@@ -29,7 +29,7 @@ public class ReviewServiceTest {
     private ReviewRepository reviewRepository;
 
     @Mock
-    private KeywordRepositoryCustom keywordRepositoryCustom;
+    private KeywordRepository keywordRepository;
 
     @Mock
     private ReviewRepositoryCustom reviewRepositoryCustom;
@@ -86,13 +86,13 @@ public class ReviewServiceTest {
 
     @Test
     public void validateFoodKeywordShouldSuccessWhenNotFound() {
-        Mockito.when(keywordRepositoryCustom.searchKeyword(Mockito.anyString())).thenReturn(null);
+        Mockito.when(keywordRepository.findFirstByKeyword(Mockito.anyString())).thenReturn(null);
         Assert.assertFalse(reviewService.validateFoodKeyword("key word"));
     }
 
     @Test
     public void validateFoodKeywordShouldSuccessWhenFound() {
-        Mockito.when(keywordRepositoryCustom.searchKeyword(Mockito.anyString())).thenReturn(new Keyword());
+        Mockito.when(keywordRepository.findFirstByKeyword(Mockito.anyString())).thenReturn(new Keyword());
         Assert.assertTrue(reviewService.validateFoodKeyword("key word"));
     }
 
@@ -105,9 +105,9 @@ public class ReviewServiceTest {
         ReviewListResponse response = reviewService.getReviewsByQuery("fried rice");
         Assert.assertEquals(2, response.getCount().intValue());
         Assert.assertTrue(response.getReviews().stream()
-                .anyMatch(x-> x.getId().equals(1) && x.getReviewContent().equals("eat <keyword>fried rice</keyword>, with another great <keyword>fried rice</keyword>")));
+                .anyMatch(x -> x.getId().equals(1) && x.getReviewContent().equals("eat <keyword>fried rice</keyword>, with another great <keyword>fried rice</keyword>")));
         Assert.assertTrue(response.getReviews().stream()
-                .anyMatch(x-> x.getId().equals(2) && x.getReviewContent().equals("with another great <keyword>fried rice</keyword>, eat <keyword>Fried rice</keyword>, eat <keyword>fried rice</keyword>")));
+                .anyMatch(x -> x.getId().equals(2) && x.getReviewContent().equals("with another great <keyword>fried rice</keyword>, eat <keyword>Fried rice</keyword>, eat <keyword>fried rice</keyword>")));
 
     }
 

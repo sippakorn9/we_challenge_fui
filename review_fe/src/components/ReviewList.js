@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Card, CardColumns, Form, Col, Button, Container, Row, Jumbotron, InputGroup, Modal } from 'react-bootstrap'
+import { API_BASE_URL } from '../constants';
 import Parser from 'html-react-parser';
 
 export class ReviewList extends Component {
@@ -7,7 +8,6 @@ export class ReviewList extends Component {
         super(props);
         this.state = {
             isLoaded: false,
-            error: null,
             show: false,
             items: [],
             search: "1",
@@ -32,10 +32,16 @@ export class ReviewList extends Component {
     }
 
     searchById() {
-        fetch("http://localhost:8080/reviews/" + this.state.search)
-            .then(res => res.json())
+        fetch(API_BASE_URL + "/reviews/" + this.state.search)
+            .then(res => {
+                if (!res.ok) {
+                    throw Error(res.statusText);
+                }
+                return res.json();
+            })
             .then(
                 (result) => {
+                    console.log(result)
                     this.setState({
                         isLoaded: true,
                         items: [result]
@@ -44,16 +50,29 @@ export class ReviewList extends Component {
                 (error) => {
                     this.setState({
                         isLoaded: true,
-                        error
+                        items: []
                     });
                 }
             )
+            .catch(
+                (error) => {
+                    this.setState({
+                        isLoaded: true,
+                        items: []
+                    });
+                }
+            );
     }
 
 
     searchByQuery() {
-        fetch("http://localhost:8080/reviews?query=" + this.state.search)
-            .then(res => res.json())
+        fetch(API_BASE_URL + "/reviews?query=" + this.state.search)
+            .then(res => {
+                if (!res.ok) {
+                    throw Error(res.statusText);
+                }
+                return res.json();
+            })
             .then(
                 (result) => {
                     this.setState({
@@ -64,10 +83,18 @@ export class ReviewList extends Component {
                 (error) => {
                     this.setState({
                         isLoaded: true,
-                        error
+                        items: []
                     });
                 }
             )
+            .catch(
+                (error) => {
+                    this.setState({
+                        isLoaded: true,
+                        items: []
+                    });
+                }
+            );
     }
 
     handleChangeSearch(event) {
@@ -106,8 +133,8 @@ export class ReviewList extends Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ reviewContent: this.state.content })
         };
-        fetch("http://localhost:8080/reviews/" + this.state.select, requestOptions)
-            .then(data => this.setState({ show: false, items: []}));
+        fetch(API_BASE_URL + "/reviews/" + this.state.select, requestOptions)
+            .then(data => this.setState({ show: false, items: [] }));
     }
 
     handleRequestToEdit(event, item) {
@@ -169,7 +196,7 @@ export class ReviewList extends Component {
                                 <Card.Header>{item.id}</Card.Header>
                                 <Card.Body>
                                     <Card.Text>
-                                        {Parser(item.reviewContent.replaceAll('keyword', 'b'))}
+                                        {Parser(item?.reviewContent?.replaceAll('keyword', 'b'))}
                                     </Card.Text>
                                     <Button variant="outline-primary" onClick={e => this.handleRequestToEdit(e, item)}>Edit</Button>
                                 </Card.Body>
