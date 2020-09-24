@@ -1,4 +1,4 @@
-# we_challenge_fui
+# we_challenge
 Repository for Wongnai WeChallenge
 
 Run by docker-compose -f docker-compose.yml up -d
