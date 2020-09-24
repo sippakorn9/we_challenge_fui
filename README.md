@@ -1,6 +1,9 @@
 # we_challenge_fui
 Repository for Wongnai WeChallenge
 
+Run by docker-compose -f docker-compose.yml up -d
+Client Side Application can access by port 5555
+Server Side Application can access by port 8080
 
 ### API Docs
 
