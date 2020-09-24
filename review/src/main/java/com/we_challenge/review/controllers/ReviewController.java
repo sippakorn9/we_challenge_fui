@@ -3,6 +3,7 @@ package com.we_challenge.review.controllers;
 import com.we_challenge.review.models.requests.EditReviewRequest;
 import com.we_challenge.review.models.responses.ErrorResponse;
 import com.we_challenge.review.models.responses.ReviewDetailResponse;
+import com.we_challenge.review.models.responses.ReviewListResponse;
 import com.we_challenge.review.services.ReviewService;
 import com.we_challenge.review.utils.Protocol;
 import org.apache.logging.log4j.LogManager;
@@ -14,9 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
 
 @RestController
 public class ReviewController {
@@ -41,9 +41,20 @@ public class ReviewController {
     }
 
     @PostMapping(Protocol.REVIEW_BY_ID)
-    public ResponseEntity<?> editReviewById(@PathVariable("id") Integer id, @Valid @RequestBody EditReviewRequest request) {
+    public ResponseEntity<?> editReviewById(@PathVariable("id") Integer id, @RequestBody EditReviewRequest request) {
         logger.info("[Request to editReviewById : {}, content : {}]", id, request);
+        if (request.getReviewContent() == null) {
+            logger.error("[ERROR] Request to edit with null content");
+            return new ResponseEntity<>(new ErrorResponse("400", "reviewContent is required."), HttpStatus.BAD_REQUEST);
+        }
         reviewService.saveReviewContent(id, request);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(Protocol.REVIEWS)
+    public ResponseEntity<?> getReviewById(@RequestParam(name = "query") String query) {
+        logger.info("[Request to getReviewByQuery : {}]", query);
+        ReviewListResponse response = reviewService.getReviewsByQuery(query);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

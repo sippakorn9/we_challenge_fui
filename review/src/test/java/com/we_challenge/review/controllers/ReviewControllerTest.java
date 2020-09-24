@@ -68,6 +68,23 @@ public class ReviewControllerTest {
     }
 
     @Test
+    public void editReviewByIdShouldErrorWhenNotNullContent() throws Exception {
+        String url = Protocol.REVIEW_BY_ID.replace("{id}", "1");
+
+        EditReviewRequest editReviewRequest = new EditReviewRequest();
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                .post(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(editReviewRequest))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("400"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("reviewContent is required."));
+    }
+
+    @Test
     public void editReviewByIdShouldSuccess() throws Exception {
         String url = Protocol.REVIEW_BY_ID.replace("{id}", "1");
         EditReviewRequest editReviewRequest = new EditReviewRequest("new content");
