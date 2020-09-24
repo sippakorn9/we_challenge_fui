@@ -2,7 +2,7 @@ drop table IF EXISTS Review;
 drop table IF EXISTS Keyword;
 
 create TABLE Review(ID INT PRIMARY KEY, CONTENT NVARCHAR(MAX))
-    AS select ID, CONTENT from CSVREAD('src/main/resources/test_file.csv',null, 'fieldSeparator=,');
+    AS select ID, CONTENT from CSVREAD('classpath:/test_file.csv',null, 'fieldSeparator=,');
 
 alter table Review add VERSION INT NOT NULL DEFAULT 0;
 
@@ -15,4 +15,4 @@ CREATE INDEX keyword
 ON Keyword(keyword);
 
 INSERT INTO Keyword (KEYWORD)
-select * FROM CSVREAD('src/main/resources/n_food_dictionary.csv');
+select * FROM CSVREAD('classpath:/n_food_dictionary.csv');
