@@ -1,9 +1,13 @@
 package com.we_challenge.review.services;
 
+import com.we_challenge.review.entities.Keyword;
 import com.we_challenge.review.entities.Review;
 import com.we_challenge.review.models.requests.EditReviewRequest;
 import com.we_challenge.review.models.responses.ReviewDetailResponse;
+import com.we_challenge.review.models.responses.ReviewListResponse;
+import com.we_challenge.review.repositories.KeywordRepositoryCustom;
 import com.we_challenge.review.repositories.ReviewRepository;
+import com.we_challenge.review.repositories.ReviewRepositoryCustom;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,17 +16,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReviewServiceTest {
     @InjectMocks
-    ReviewService reviewService;
+    private ReviewService reviewService;
 
     @Mock
-    ReviewRepository reviewRepository;
+    private ReviewRepository reviewRepository;
+
+    @Mock
+    private KeywordRepositoryCustom keywordRepositoryCustom;
+
+    @Mock
+    private ReviewRepositoryCustom reviewRepositoryCustom;
 
     private Review getMockReview() {
         return new Review(1, "review content with fried rice", 0);
@@ -72,6 +82,33 @@ public class ReviewServiceTest {
         Review savedReview = reviewArgumentCaptor.getValue();
         Assert.assertEquals(1, savedReview.getId().intValue());
         Assert.assertEquals("new content", savedReview.getContent());
+    }
+
+    @Test
+    public void validateFoodKeywordShouldSuccessWhenNotFound() {
+        Mockito.when(keywordRepositoryCustom.searchKeyword(Mockito.anyString())).thenReturn(null);
+        Assert.assertFalse(reviewService.validateFoodKeyword("key word"));
+    }
+
+    @Test
+    public void validateFoodKeywordShouldSuccessWhenFound() {
+        Mockito.when(keywordRepositoryCustom.searchKeyword(Mockito.anyString())).thenReturn(new Keyword());
+        Assert.assertTrue(reviewService.validateFoodKeyword("key word"));
+    }
+
+    @Test
+    public void getReviewsByQueryShouldSuccess() {
+        Review review1 = new Review(1, "eat fried rice, with another great fried rice");
+        Review review2 = new Review(2, "with another great fried rice, eat Fried rice, eat fried rice");
+
+        Mockito.when(reviewRepositoryCustom.searchReviewByQuery(Mockito.anyString())).thenReturn(Arrays.asList(review1, review2));
+        ReviewListResponse response = reviewService.getReviewsByQuery("fried rice");
+        Assert.assertEquals(2, response.getCount().intValue());
+        Assert.assertTrue(response.getReviews().stream()
+                .anyMatch(x-> x.getId().equals(1) && x.getReviewContent().equals("eat <keyword>fried rice</keyword>, with another great <keyword>fried rice</keyword>")));
+        Assert.assertTrue(response.getReviews().stream()
+                .anyMatch(x-> x.getId().equals(2) && x.getReviewContent().equals("with another great <keyword>fried rice</keyword>, eat <keyword>Fried rice</keyword>, eat <keyword>fried rice</keyword>")));
+
     }
 
 }

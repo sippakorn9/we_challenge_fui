@@ -52,8 +52,12 @@ public class ReviewController {
     }
 
     @GetMapping(Protocol.REVIEWS)
-    public ResponseEntity<?> getReviewById(@RequestParam(name = "query") String query) {
+    public ResponseEntity<?> getReviewByQuery(@RequestParam(name = "query") String query) {
         logger.info("[Request to getReviewByQuery : {}]", query);
+        if (!reviewService.validateFoodKeyword(query)) {
+            logger.info("[getReviewByQuery] Not query review cause by keyword not exist in dictionary");
+            return new ResponseEntity<>(new ReviewListResponse(), HttpStatus.OK);
+        }
         ReviewListResponse response = reviewService.getReviewsByQuery(query);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

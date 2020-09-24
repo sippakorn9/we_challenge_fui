@@ -4,6 +4,7 @@ import com.we_challenge.review.entities.Review;
 import com.we_challenge.review.models.requests.EditReviewRequest;
 import com.we_challenge.review.models.responses.ReviewDetailResponse;
 import com.we_challenge.review.models.responses.ReviewListResponse;
+import com.we_challenge.review.repositories.KeywordRepositoryCustom;
 import com.we_challenge.review.repositories.ReviewRepository;
 import com.we_challenge.review.repositories.ReviewRepositoryCustom;
 import org.apache.logging.log4j.LogManager;
@@ -25,12 +26,16 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
 
+    private final KeywordRepositoryCustom keywordRepositoryCustom;
+
     private final ReviewRepositoryCustom reviewRepositoryCustom;
 
     @Autowired
     public ReviewService(ReviewRepository reviewRepository,
+                         KeywordRepositoryCustom keywordRepositoryCustom,
                          ReviewRepositoryCustom reviewRepositoryCustom) {
         this.reviewRepository = reviewRepository;
+        this.keywordRepositoryCustom = keywordRepositoryCustom;
         this.reviewRepositoryCustom = reviewRepositoryCustom;
     }
 
@@ -63,6 +68,10 @@ public class ReviewService {
     )
     private void saveReview(Review review) {
         reviewRepository.save(review);
+    }
+
+    public boolean validateFoodKeyword(String keyword) {
+        return keywordRepositoryCustom.searchKeyword(keyword) != null;
     }
 
     public ReviewListResponse getReviewsByQuery(String keyword) {

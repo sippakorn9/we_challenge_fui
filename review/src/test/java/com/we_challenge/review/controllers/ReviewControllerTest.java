@@ -3,6 +3,7 @@ package com.we_challenge.review.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.we_challenge.review.models.requests.EditReviewRequest;
 import com.we_challenge.review.models.responses.ReviewDetailResponse;
+import com.we_challenge.review.models.responses.ReviewListResponse;
 import com.we_challenge.review.services.ReviewService;
 import com.we_challenge.review.utils.Protocol;
 import org.junit.Before;
@@ -23,10 +24,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 public class ReviewControllerTest {
 
     @InjectMocks
-    ReviewController reviewController;
+    private ReviewController reviewController;
 
     @Mock
-    ReviewService reviewService;
+    private ReviewService reviewService;
 
     private MockMvc mockMvc;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -100,5 +101,35 @@ public class ReviewControllerTest {
         mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk());
     }
 
+    @Test
+    public void getReviewByQueryShouldSuccessWhenNotExistKeyword() throws Exception {
+        String url = Protocol.REVIEWS + "?query=not fried rice";
+
+        Mockito.when(reviewService.validateFoodKeyword(Mockito.anyString())).thenReturn(false);
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                .get(url);
+
+        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.count").value(0));
+        Mockito.verify(reviewService, Mockito.never()).getReviewsByQuery(Mockito.anyString());
+    }
+
+    @Test
+    public void getReviewByQueryShouldSuccessWhenExistKeyword() throws Exception {
+        String url = Protocol.REVIEWS + "?query=fried rice";
+        ReviewListResponse response = new ReviewListResponse();
+        response.setCount(1);
+
+        Mockito.when(reviewService.validateFoodKeyword(Mockito.anyString())).thenReturn(true);
+        Mockito.when(reviewService.getReviewsByQuery(Mockito.anyString())).thenReturn(response);
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                .get(url);
+
+        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.count").value(1));
+        Mockito.verify(reviewService, Mockito.times(1)).getReviewsByQuery(Mockito.anyString());
+    }
 
 }
